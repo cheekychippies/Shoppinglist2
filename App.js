@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, Text, TextInput, View, Button, FlatList } from 'react-native';
+import { StyleSheet, Text, TextInput, View, FlatList } from 'react-native';
+import { Header, Input, Button, ListItem } from '@rneui/themed';
 import * as SQLite from 'expo-sqlite';
 
 const db = SQLite.openDatabase('shoppingdb.db');
@@ -41,36 +42,52 @@ export default function App() {
     )
   }
 
-  const listSeparator = () => {
-    return (
-      <View
-        style={{
-          height: 5,
-          width: "80%",
-          backgroundColor: "#fff",
-          marginLeft: "10%"
-        }}
+  /* const listSeparator = () => {
+     return (
+       <View
+         style={{
+           height: 5,
+           width: "80%",
+           backgroundColor: "#fff",
+           marginLeft: "10%"
+         }}
+       />
+     );
+   };*/
+  renderItem = ({ item }) => (
+    <ListItem bottomDivider>
+      <ListItem.Content>
+        <ListItem.Title>{item.title}</ListItem.Title>
+        <ListItem.Subtitle>{item.credits}</ListItem.Subtitle>
+      </ListItem.Content>
+      <ListItem.Chevron
+        name="delete"
+        type="material"
+        color="#0000ff"
+        onPress={() => deleteItem(item.id)}
       />
-    );
-  };
-
+    </ListItem>
+  )
   return (
     <View style={styles.container}>
-      <TextInput placeholder='Product' style={{ marginTop: 30, fontSize: 18, width: 200, borderColor: 'gray', borderWidth: 1 }}
+      <Header
+        leftComponent={{ icon: 'menu', color: '#fff' }}
+        centerComponent={{ text: 'SHOPPING LIST', style: { color: '#fff' } }}
+        rightComponent={{ icon: 'home', color: '#fff' }}
+      />
+      <Input placeholder='Product' style={{ marginTop: 30, fontSize: 18, width: 200 }}
         onChangeText={(ammount) => setAmmount(ammount)}
         value={ammount} />
-      <TextInput placeholder='Ammount' keyboardType="numeric" style={{ marginTop: 5, marginBottom: 5, fontSize: 18, width: 200, borderColor: 'gray', borderWidth: 1 }}
+      <Input placeholder='Ammount' keyboardType="numeric" style={{ marginTop: 5, marginBottom: 5, fontSize: 18, width: 200 }}
         onChangeText={(product) => setProduct(product)}
         value={product} />
-      <Button onPress={saveItem} title="Save" />
+      <Button raised icon={{ name: 'save' }} onPress={saveItem} title="Save" />
       <Text style={{ marginTop: 30, fontSize: 20 }}>Shopping list</Text>
       <FlatList
-        style={{ marginLeft: "5%" }}
-        keyExtractor={item => item.id.toString()}
-        renderItem={({ item }) => <View style={styles.listcontainer}><Text style={{ fontSize: 18 }}>{item.title}, {item.credits}</Text>
-          <Text style={{ fontSize: 18, color: '#0000ff' }} onPress={() => deleteItem(item.id)}> Bought</Text></View>}
+        style={styles.list}
         data={shoppings}
-        ItemSeparatorComponent={listSeparator}
+        renderItem={renderItem}
+        keyExtractor={(item, index) => index.toString()}
       />
     </View>
   );
@@ -88,4 +105,9 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     alignItems: 'center'
   },
+
+  list: {
+    width: '75%'
+  }
+
 });
